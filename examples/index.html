@@ -6,7 +6,7 @@
 		<title>skinview3d</title>
 		<style>
 			body {
-				margin: 0;
+				margin: unset !important;
 				padding: 20px;
 				display: flex;
 				flex-direction: row;
@@ -37,12 +37,19 @@
 				#skin_container {
 					width: 100%;
 					height: 400px;
-					position: relative;
 					top: 0;
 				}
 
 				.controls {
 					padding-right: 0;
+				}
+				#canvas_warp {
+					width: 100%;
+					top: 0px;
+					background: rgba(255, 255, 255, 0.6);
+					position: sticky;
+					backdrop-filter: blur(10px);
+					padding-bottom: 10px;
 				}
 			}
 
@@ -76,8 +83,9 @@
 	</head>
 
 	<body>
-		<canvas id="skin_container"></canvas>
-
+		<div id="canvas_warp">
+			<canvas id="skin_container"></canvas>
+		</div>
 		<div class="controls">
 			<button id="reset_all" type="button" class="control">Reset All</button>
 
@@ -180,6 +188,7 @@
 					<label><input type="radio" id="animation_wave" name="animation" value="wave" /> Wave</label>
 					<label><input type="radio" id="animation_crouch" name="animation" value="crouch" /> Crouch</label>
 					<label><input type="radio" id="animation_hit" name="animation" value="hit" /> Hit</label>
+					<label><input type="radio" id="animation_swim" name="animation" value="swim" /> Swim</label>
 				</div>
 				<label class="control">Speed: <input id="animation_speed" type="number" value="1" step="0.1" size="3" /></label>
 				<button id="animation_pause_resume" type="button" class="control">Pause / Resume</button>
