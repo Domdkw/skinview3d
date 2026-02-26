@@ -240,6 +240,24 @@ function initializeControls(): void {
 	});
 
 	const animationRadios = document.querySelectorAll<HTMLInputElement>('input[type="radio"][name="animation"]');
+	const poseControl = document.getElementById("pose_control");
+	const poseTable = document.getElementById("pose_table") as HTMLTableElement | null;
+
+	const updatePoseControlState = (enabled: boolean) => {
+		if (poseControl) {
+			poseControl.style.opacity = enabled ? "1" : "0.5";
+			poseControl.style.pointerEvents = enabled ? "auto" : "none";
+		}
+		if (poseTable) {
+			const inputs = poseTable.querySelectorAll<HTMLInputElement>("input");
+			inputs.forEach(input => {
+				input.disabled = !enabled;
+			});
+		}
+	};
+
+	updatePoseControlState(true);
+
 	for (const el of animationRadios) {
 		el.addEventListener("change", e => {
 			const target = e.target as HTMLInputElement;
@@ -250,11 +268,14 @@ function initializeControls(): void {
 
 			if (target.value === "") {
 				skinViewer.animation = null;
+				updatePoseControlState(true);
+				restorePose();
 			} else {
 				skinViewer.animation = availableAnimations[target.value];
 				if (skinViewer.animation && animationSpeed) {
 					skinViewer.animation.speed = Number(animationSpeed.value);
 				}
+				updatePoseControlState(false);
 			}
 		});
 	}
@@ -338,6 +359,70 @@ function initializeControls(): void {
 		}
 		if (animationCrouch?.checked && addHittingAnimation?.checked && hitSpeed?.value === "") {
 			updateCrouchAnimation();
+		}
+	});
+
+	const poseParts = ["head", "body", "rightArm", "leftArm", "rightLeg", "leftLeg"] as const;
+	type PosePart = (typeof poseParts)[number];
+
+	const getPoseInput = (part: PosePart, axis: "x" | "y" | "z"): HTMLInputElement | null => {
+		return document.getElementById(`pose_${part}_${axis}`) as HTMLInputElement | null;
+	};
+
+	const savedPose: Record<PosePart, { x: number; y: number; z: number }> = {
+		head: { x: 0, y: 0, z: 0 },
+		body: { x: 0, y: 0, z: 0 },
+		rightArm: { x: 0, y: 0, z: 0 },
+		leftArm: { x: 0, y: 0, z: 0 },
+		rightLeg: { x: 0, y: 0, z: 0 },
+		leftLeg: { x: 0, y: 0, z: 0 },
+	};
+
+	const applyPose = () => {
+		const skin = skinViewer.playerObject.skin;
+		for (const part of poseParts) {
+			const xInput = getPoseInput(part, "x");
+			const yInput = getPoseInput(part, "y");
+			const zInput = getPoseInput(part, "z");
+			if (xInput && yInput && zInput) {
+				const x = Number(xInput.value);
+				const y = Number(yInput.value);
+				const z = Number(zInput.value);
+				skin[part].rotation.x = x;
+				skin[part].rotation.y = y;
+				skin[part].rotation.z = z;
+				savedPose[part] = { x, y, z };
+			}
+		}
+	};
+
+	const restorePose = () => {
+		const skin = skinViewer.playerObject.skin;
+		for (const part of poseParts) {
+			skin[part].rotation.x = savedPose[part].x;
+			skin[part].rotation.y = savedPose[part].y;
+			skin[part].rotation.z = savedPose[part].z;
+		}
+	};
+
+	for (const part of poseParts) {
+		for (const axis of ["x", "y", "z"] as const) {
+			const input = getPoseInput(part, axis);
+			input?.addEventListener("input", () => {
+				applyPose();
+			});
+		}
+	}
+
+	document.getElementById("pose_reset")?.addEventListener("click", () => {
+		skinViewer.playerObject.skin.resetJoints();
+		for (const part of poseParts) {
+			for (const axis of ["x", "y", "z"] as const) {
+				const input = getPoseInput(part, axis);
+				if (input) {
+					input.value = "0";
+				}
+			}
 		}
 	});
 

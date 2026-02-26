@@ -134,7 +134,6 @@ export class SkinObject extends Group {
 		this.head.add(headMesh, head2Mesh);
 		headMesh.position.y = 4;
 		head2Mesh.position.y = 4;
-		this.add(this.head);
 
 		// Body
 		const bodyBox = new BoxGeometry(8, 12, 4);
@@ -148,8 +147,12 @@ export class SkinObject extends Group {
 		this.body = new BodyPart(bodyMesh, body2Mesh);
 		this.body.name = "body";
 		this.body.add(bodyMesh, body2Mesh);
-		this.body.position.y = -6;
+
 		this.add(this.body);
+
+		// Set body as parent for other body parts (relative positioning)
+		this.body.add(this.head);
+		this.head.position.set(0, 6, 0);
 
 		// Right Arm
 		const rightArmBox = new BoxGeometry();
@@ -180,9 +183,8 @@ export class SkinObject extends Group {
 		this.rightArm = new BodyPart(rightArmMesh, rightArm2Mesh);
 		this.rightArm.name = "rightArm";
 		this.rightArm.add(rightArmPivot);
-		this.rightArm.position.x = -5;
-		this.rightArm.position.y = -2;
-		this.add(this.rightArm);
+		this.body.add(this.rightArm);
+		this.rightArm.position.set(-5, 4, 0);
 
 		// Left Arm
 		const leftArmBox = new BoxGeometry();
@@ -213,9 +215,8 @@ export class SkinObject extends Group {
 		this.leftArm = new BodyPart(leftArmMesh, leftArm2Mesh);
 		this.leftArm.name = "leftArm";
 		this.leftArm.add(leftArmPivot);
-		this.leftArm.position.x = 5;
-		this.leftArm.position.y = -2;
-		this.add(this.leftArm);
+		this.body.add(this.leftArm);
+		this.leftArm.position.set(5, 4, 0);
 
 		// Right Leg
 		const rightLegBox = new BoxGeometry(4, 12, 4);
@@ -233,10 +234,8 @@ export class SkinObject extends Group {
 		this.rightLeg = new BodyPart(rightLegMesh, rightLeg2Mesh);
 		this.rightLeg.name = "rightLeg";
 		this.rightLeg.add(rightLegPivot);
-		this.rightLeg.position.x = -1.9;
-		this.rightLeg.position.y = -12;
-		this.rightLeg.position.z = -0.1;
-		this.add(this.rightLeg);
+		this.body.add(this.rightLeg);
+		this.rightLeg.position.set(-2, -6, -0.1);
 
 		// Left Leg
 		const leftLegBox = new BoxGeometry(4, 12, 4);
@@ -254,10 +253,8 @@ export class SkinObject extends Group {
 		this.leftLeg = new BodyPart(leftLegMesh, leftLeg2Mesh);
 		this.leftLeg.name = "leftLeg";
 		this.leftLeg.add(leftLegPivot);
-		this.leftLeg.position.x = 1.9;
-		this.leftLeg.position.y = -12;
-		this.leftLeg.position.z = -0.1;
-		this.add(this.leftLeg);
+		this.body.add(this.leftLeg);
+		this.leftLeg.position.set(2, -6, -0.1);
 
 		this.modelType = "default";
 	}
@@ -310,21 +307,6 @@ export class SkinObject extends Group {
 		this.leftLeg.rotation.set(0, 0, 0);
 		this.rightLeg.rotation.set(0, 0, 0);
 		this.body.rotation.set(0, 0, 0);
-		this.head.position.y = 0;
-		this.body.position.y = -6;
-		this.body.position.z = 0;
-		this.rightArm.position.x = -5;
-		this.rightArm.position.y = -2;
-		this.rightArm.position.z = 0;
-		this.leftArm.position.x = 5;
-		this.leftArm.position.y = -2;
-		this.leftArm.position.z = 0;
-		this.rightLeg.position.x = -1.9;
-		this.rightLeg.position.y = -12;
-		this.rightLeg.position.z = -0.1;
-		this.leftLeg.position.x = 1.9;
-		this.leftLeg.position.y = -12;
-		this.leftLeg.position.z = -0.1;
 	}
 }
 
@@ -482,23 +464,21 @@ export class PlayerObject extends Group {
 
 		this.skin = new SkinObject();
 		this.skin.name = "skin";
-		this.skin.position.y = 8;
+		this.skin.position.y = 0;
 		this.add(this.skin);
 
 		this.cape = new CapeObject();
 		this.cape.name = "cape";
-		this.cape.position.y = 8;
-		this.cape.position.z = -2;
+		this.skin.body.add(this.cape);
+		this.cape.position.set(0, 5, -2);
 		this.cape.rotation.x = CapeDefaultAngle;
 		this.cape.rotation.y = Math.PI;
-		this.add(this.cape);
 
 		this.elytra = new ElytraObject();
 		this.elytra.name = "elytra";
-		this.elytra.position.y = 8;
-		this.elytra.position.z = -2;
+		this.skin.body.add(this.elytra);
+		this.elytra.position.set(0, 0, -2);
 		this.elytra.visible = false;
-		this.add(this.elytra);
 
 		this.ears = new EarsObject();
 		this.ears.name = "ears";
@@ -526,10 +506,8 @@ export class PlayerObject extends Group {
 	resetJoints(): void {
 		this.skin.resetJoints();
 		this.cape.rotation.x = CapeDefaultAngle;
-		this.cape.position.y = 8;
-		this.cape.position.z = -2;
-		this.elytra.position.y = 8;
-		this.elytra.position.z = -2;
+		this.cape.position.set(0, 0, -2);
+		this.elytra.position.set(0, 0, -2);
 		this.elytra.rotation.x = 0;
 		this.elytra.resetJoints();
 	}
