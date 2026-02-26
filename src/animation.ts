@@ -292,6 +292,10 @@ export class CrouchAnimation extends PlayerAnimation {
 	}
 	private erp: number = 0; //elytra rotate progress
 	private isCrouched: boolean | undefined;
+	/**
+	 * 动画主方法，应用蹲伏动画效果
+	 * @param player - 玩家对象
+	 */
 	protected animate(player: PlayerObject): void {
 		let pr = this.progress * 8;
 		if (pr === 0) {
@@ -303,20 +307,24 @@ export class CrouchAnimation extends PlayerAnimation {
 		if (!this.showProgress) {
 			pr = Math.floor(pr);
 		}
-		player.skin.body.rotation.x = 0.4537860552 * Math.abs(Math.sin((pr * Math.PI) / 2));
-		player.skin.body.position.z =
-			1.3256181 * Math.abs(Math.sin((pr * Math.PI) / 2)) - 3.4500310377 * Math.abs(Math.sin((pr * Math.PI) / 2));
-		player.skin.body.position.y = -6 - 2.103677462 * Math.abs(Math.sin((pr * Math.PI) / 2));
-		player.cape.position.y = 8 - 1.851236166577372 * Math.abs(Math.sin((pr * Math.PI) / 2));
-		player.cape.rotation.x = (10.8 * Math.PI) / 180 + 0.294220265771 * Math.abs(Math.sin((pr * Math.PI) / 2));
+		
+		const crouchFactor = Math.abs(Math.sin((pr * Math.PI) / 2));
+		
+		player.skin.body.rotation.x = 0.4 * crouchFactor;
+		//player.skin.body.position.z =
+			1.3256181 * crouchFactor - 3.4500310377 * crouchFactor;
+		player.skin.body.position.y = -6 - 2.103677462 * crouchFactor;
+		//player.cape.position.y = 8 - 1.851236166577372 * crouchFactor;
+		player.cape.rotation.x = (10.8 * Math.PI) / 180 + 0.294220265771 * crouchFactor;
 		player.cape.position.z =
-			-2 + 3.786619432 * Math.abs(Math.sin((pr * Math.PI) / 2)) - 3.4500310377 * Math.abs(Math.sin((pr * Math.PI) / 2));
+			-2 + 3.786619432 * crouchFactor - 3.4500310377 * crouchFactor;
 		player.elytra.position.x = player.cape.position.x;
 		player.elytra.position.y = player.cape.position.y;
 		player.elytra.position.z = player.cape.position.z;
 		player.elytra.rotation.x = player.cape.rotation.x - (10.8 * Math.PI) / 180;
+		
 		const pr1 = this.progress / this.speed;
-		if (Math.abs(Math.sin((pr * Math.PI) / 2)) === 1 || (this.showProgress && Math.floor(Math.abs(pr)) % 2 === 0)) {
+		if (crouchFactor === 1 || (this.showProgress && Math.floor(Math.abs(pr)) % 2 === 0)) {
 			this.erp = !this.isCrouched ? pr1 : this.erp;
 			this.isCrouched = true;
 			player.elytra.leftWing.rotation.z =
@@ -331,7 +339,9 @@ export class CrouchAnimation extends PlayerAnimation {
 			player.elytra.updateRightWing();
 			this.isCrouched = false;
 		}
-		player.skin.head.position.y = -3.618325234674 * Math.abs(Math.sin((pr * Math.PI) / 2));
+		
+		player.skin.head.rotation.x = -0.4 * crouchFactor;
+		/*player.skin.head.position.y = -3.618325234674 * crouchFactor;
 		player.skin.leftArm.position.z =
 			3.618325234674 * Math.abs(Math.sin((pr * Math.PI) / 2)) - 3.4500310377 * Math.abs(Math.sin((pr * Math.PI) / 2));
 		player.skin.rightArm.position.z = player.skin.leftArm.position.z;
@@ -341,17 +351,19 @@ export class CrouchAnimation extends PlayerAnimation {
 		player.skin.rightArm.rotation.z = -player.skin.leftArm.rotation.z;
 		player.skin.leftArm.position.y = -2 - 2.53943318 * Math.abs(Math.sin((pr * Math.PI) / 2));
 		player.skin.rightArm.position.y = player.skin.leftArm.position.y;
-		player.skin.rightLeg.position.z = -3.4500310377 * Math.abs(Math.sin((pr * Math.PI) / 2));
-		player.skin.leftLeg.position.z = player.skin.rightLeg.position.z;
+		*/player.skin.rightLeg.rotation.x = -0.4 * crouchFactor;
+		player.skin.leftLeg.rotation.x = player.skin.rightLeg.rotation.x;
+		//player.skin.rightLeg.position.z = -3.4500310377 * crouchFactor;
+		//player.skin.leftLeg.position.z = player.skin.rightLeg.position.z;
+		
 		if (this.isRunningHitAnimation) {
-			const pr2 = this.progress;
 			let t = (this.progress * 18 * this.hitAnimationSpeed) / this.speed;
 
 			if (this.speed == 0) {
 				t = 0;
 			}
 
-			const isCrouching = Math.abs(Math.sin((pr2 * Math.PI) / 2)) === 1;
+			const isCrouching = crouchFactor === 1;
 			player.skin.rightArm.rotation.x =
 				-0.4537860552 + 2 * Math.sin(t + Math.PI) * 0.3 - (isCrouching ? 0.4537860552 : 0);
 			const basicArmRotationZ = 0.01 * Math.PI + 0.06;

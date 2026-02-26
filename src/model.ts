@@ -477,7 +477,7 @@ export class PlayerObject extends Group {
 		this.elytra = new ElytraObject();
 		this.elytra.name = "elytra";
 		this.skin.body.add(this.elytra);
-		this.elytra.position.set(0, 0, -2);
+		this.elytra.position.set(0, 4, -2);
 		this.elytra.visible = false;
 
 		this.ears = new EarsObject();
@@ -506,8 +506,8 @@ export class PlayerObject extends Group {
 	resetJoints(): void {
 		this.skin.resetJoints();
 		this.cape.rotation.x = CapeDefaultAngle;
-		this.cape.position.set(0, 0, -2);
-		this.elytra.position.set(0, 0, -2);
+		this.cape.position.set(0, 5, -2);
+		this.elytra.position.set(0, 4, -2);
 		this.elytra.rotation.x = 0;
 		this.elytra.resetJoints();
 	}
